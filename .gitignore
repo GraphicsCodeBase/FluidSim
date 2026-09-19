@@ -1,0 +1,9 @@
+build/
+vcpkg_installed/
+out/
+.vs/
+*.user
+*.suo
+*.sdf
+*.opendb
+docs/results/*.csv
