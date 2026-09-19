@@ -9,6 +9,7 @@
 
 #include "engine/DisplayTexture.h"
 #include "engine/Shader.h"
+#include "engine/Field.h"
 #include "sim/testpattern.h"
 
 #include <cstdio>
