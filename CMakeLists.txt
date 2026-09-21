@@ -40,11 +40,33 @@ add_executable(fluid
     src/engine/Shader.cpp
     src/engine/DisplayTexture.cpp
 
-    # Layer 2 - Physics (the actual project; a Phase 0 placeholder for now)
+    # Layer 2 - Physics (the actual project)
+    src/sim/Solver2D.cu
     src/sim/testpattern.cu
+
+    # Headers. Not required for compilation - listed so they appear in the
+    # IDE's file tree alongside the sources that implement them.
+    include/engine/App.h
+    include/engine/CudaCheck.h
+    include/engine/DisplayTexture.h
+    include/engine/Field.h
+    include/engine/Shader.h
+    include/sim/Solver2D.h
+    include/sim/testpattern.h
 )
 
-target_include_directories(fluid PRIVATE src)
+# Headers live under include/, sources under src/. Both are on the search
+# path, so every #include stays written the same way:
+#
+#     #include "engine/Field.h"
+#     #include "sim/Solver2D.h"
+#
+# i.e. relative to the layer, never with ../ or a full path.
+target_include_directories(fluid PRIVATE include src)
+
+# Keep the IDE's folder tree matching the folders on disk.
+get_target_property(_fluid_sources fluid SOURCES)
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_fluid_sources})
 
 target_link_libraries(fluid PRIVATE
     glfw

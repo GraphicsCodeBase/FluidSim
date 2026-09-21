@@ -5,6 +5,7 @@
 struct GLFWwindow;
 class Shader;
 class DisplayTexture;
+class Solver2D;
 
 // ---------------------------------------------------------------------------
 // Layer 1 - Foundation.
@@ -31,6 +32,7 @@ private:
 
     std::unique_ptr<Shader>         m_display;
     std::unique_ptr<DisplayTexture> m_texture;
+    std::unique_ptr<Solver2D>       m_solver;
 
     // An empty VAO. Core-profile OpenGL requires one bound for any draw call,
     // even though the fullscreen triangle is generated from gl_VertexID and

@@ -9,6 +9,7 @@
 
 #include "engine/DisplayTexture.h"
 #include "engine/Shader.h"
+#include "sim/Solver2D.h"
 #include "engine/Field.h"
 #include "sim/testpattern.h"
 
@@ -62,6 +63,11 @@ bool App::init(int width, int height, const char* title)
 
     m_texture = std::make_unique<DisplayTexture>();
     if (!m_texture->create(m_simWidth, m_simHeight)) return false;
+
+    // The simulation. Created after the texture because both allocate GPU
+    // memory and it keeps the startup log in a sensible order.
+    m_solver = std::make_unique<Solver2D>();
+    m_solver->create(m_simWidth, m_simHeight);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -148,6 +154,7 @@ void App::shutdown()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    m_solver.reset();
     m_texture.reset();
     m_display.reset();
 
