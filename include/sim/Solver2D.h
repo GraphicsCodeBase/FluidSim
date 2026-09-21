@@ -1,5 +1,7 @@
 #pragma once
 #include "engine/Field.h"
+
+#include <cuda_runtime.h>   // cudaSurfaceObject_t
 // ---------------------------------------------------------------------------
 // The 2D fluid solver.
 //
@@ -15,7 +17,7 @@ public:
 
 	int width()  const { return m_width; }
 	int height() const { return m_height; }
-
+    void renderTo(cudaSurfaceObject_t surface);
 private:
 
 	VectorField m_u;     // velocity - the actual simulation state

@@ -1,4 +1,5 @@
 #include "sim/Solver2D.h"
+#include "sim/kernels.h"
 
 #include <cstdio>
 
@@ -18,4 +19,8 @@ void Solver2D::create(int width, int height)
     std::printf("[solver] %dx%d grid, %d cells\n", width, height, m_u.count());
     std::printf("[solver] velocity %zu bytes/buffer, dye %zu bytes/buffer\n",
                 m_u.bytes(), m_dye.bytes());
+}
+void Solver2D::renderTo(cudaSurfaceObject_t surface)
+{
+    launchVisualiseScalar(m_dye.read(), surface, m_width, m_height, 1.0f);
 }

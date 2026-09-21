@@ -10,8 +10,6 @@
 #include "engine/DisplayTexture.h"
 #include "engine/Shader.h"
 #include "sim/Solver2D.h"
-#include "engine/Field.h"
-#include "sim/testpattern.h"
 
 #include <cstdio>
 
@@ -102,10 +100,10 @@ void App::run()
 void App::frame(float timeSeconds)
 {
     // ---- CUDA owns the texture -------------------------------------------
-    // In Phase 1 this block becomes the whole simulation step; for now it is
-    // a single kernel painting a moving pattern.
+    // The solver copies its current dye field into the display texture. As
+    // more operators arrive this block grows into the whole simulation step.
     m_texture->map();
-    launchTestPattern(m_texture->surface(), m_simWidth, m_simHeight, timeSeconds);
+    m_solver->renderTo(m_texture->surface());
     m_texture->unmap();
 
     // ---- OpenGL owns the texture again -----------------------------------

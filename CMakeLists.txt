@@ -42,7 +42,7 @@ add_executable(fluid
 
     # Layer 2 - Physics (the actual project)
     src/sim/Solver2D.cu
-    src/sim/testpattern.cu
+    src/sim/visualise.cu
 
     # Headers. Not required for compilation - listed so they appear in the
     # IDE's file tree alongside the sources that implement them.
@@ -52,7 +52,7 @@ add_executable(fluid
     include/engine/Field.h
     include/engine/Shader.h
     include/sim/Solver2D.h
-    include/sim/testpattern.h
+    include/sim/kernels.h
 )
 
 # Headers live under include/, sources under src/. Both are on the search
