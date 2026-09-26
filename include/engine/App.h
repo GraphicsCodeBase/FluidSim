@@ -41,8 +41,10 @@ private:
 
     // Simulation grid resolution. In Phase 0 this is only the size of the
     // texture CUDA scribbles on; from Phase 1 it becomes the actual grid.
+    // 512x288 is 16:9, matching the default window, so grid cells are square
+    // and a round splat renders round rather than as a wide ellipse.
     int m_simWidth  = 512;
-    int m_simHeight = 512;
+    int m_simHeight = 288;
 
     float m_frameMs = 0.0f;
 };

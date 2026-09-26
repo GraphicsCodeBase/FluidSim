@@ -43,6 +43,7 @@ add_executable(fluid
     # Layer 2 - Physics (the actual project)
     src/sim/Solver2D.cu
     src/sim/visualise.cu
+    src/sim/splat.cu
 
     # Headers. Not required for compilation - listed so they appear in the
     # IDE's file tree alongside the sources that implement them.
