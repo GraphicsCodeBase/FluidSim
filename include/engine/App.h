@@ -25,6 +25,7 @@ public:
     void shutdown();
 
 private:
+    void handleMouse();
     void frame(float timeSeconds);
     void drawUI();
 
@@ -47,4 +48,17 @@ private:
     int m_simHeight = 288;
 
     float m_frameMs = 0.0f;
+
+    // Mouse state, polled once per frame. The previous position is kept
+    // because the velocity impulse is how far the cursor moved, which is only
+    // knowable by comparing against the last frame.
+    double m_mouseX = 0.0, m_mouseY = 0.0;
+    double m_prevMouseX = 0.0, m_prevMouseY = 0.0;
+    bool   m_mouseWasDown = false;
+
+    // Splat parameters, driven by the ImGui sliders.
+    float m_splatDye    = 1.0f;    // dye added at the centre of the blob
+    float m_splatRadius = 14.0f;   // grid cells
+    float m_splatForce  = 1.0f;    // impulse multiplier (no visible effect
+                                   // until advection exists)
 };

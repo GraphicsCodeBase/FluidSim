@@ -1,0 +1,35 @@
+{
+  // ---- CMake -------------------------------------------------------------
+  // Use CMakePresets.json rather than VS Code's own kit system, so the CLI,
+  // Visual Studio and VS Code all configure the project identically.
+  "cmake.useCMakePresets": "always",
+  "cmake.configureOnOpen": true,
+
+  // ---- IntelliSense ------------------------------------------------------
+  // Let CMake Tools feed include paths and defines to the C++ extension.
+  // Without this, every #include resolves to a red squiggle.
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "C_Cpp.default.cppStandard": "c++17",
+
+  // .cu and .cuh are CUDA C++, not plain C++. The Nsight extension provides
+  // the "cuda-cpp" language mode, which understands __global__, threadIdx,
+  // and the <<<>>> launch syntax.
+  "files.associations": {
+    "*.cu": "cuda-cpp",
+    "*.cuh": "cuda-cpp"
+  },
+
+  // ---- Editor ------------------------------------------------------------
+  // Match the rest of the codebase: 4 spaces, no tabs.
+  "editor.insertSpaces": true,
+  "editor.tabSize": 4,
+  "files.trimTrailingWhitespace": true,
+
+  // Build output and vcpkg's installed tree are noise in search results.
+  "files.exclude": {
+    "build": true
+  },
+  "search.exclude": {
+    "build": true
+  }
+}

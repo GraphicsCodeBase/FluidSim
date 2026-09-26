@@ -18,6 +18,7 @@ public:
 	int width()  const { return m_width; }
 	int height() const { return m_height; }
     void renderTo(cudaSurfaceObject_t surface);
+	void splat(float gridX, float gridY, float impulseX, float impulseY, float dyeAmount, float radius);
 private:
 
 	VectorField m_u;     // velocity - the actual simulation state

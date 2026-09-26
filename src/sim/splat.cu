@@ -83,7 +83,38 @@ __global__ void splatKernel(const float2* uIn, float2* uOut,
     // holding stale data when the caller swaps.
 }
 
-// TODO (yours): launchSplat - the plain C++ wrapper that computes the block
-// and grid dimensions and fires the kernel. Same shape as the launcher in
-// visualise.cu. kernels.h already promises it exists, so the build will fail
-// with "unresolved external symbol" until it is written.
+// ---------------------------------------------------------------------------
+// The launcher: ordinary C++, runs once on the CPU. Its only job is to work
+// out how many threads to start, then fire the kernel. This is the name the
+// rest of the program knows - splatKernel never leaves this file.
+// ---------------------------------------------------------------------------
+void launchSplat(const float2* uIn, float2* uOut,
+                 const float* dyeIn, float* dyeOut,
+                 int width, int height,
+                 float posX, float posY,
+                 float impulseX, float impulseY,
+                 float dyeAmount, float radius)
+{
+    // 256 threads per block. A multiple of 32 (the warp size) keeps the
+    // hardware fed; 16x16 is a well-worn default for 2D grids.
+    const dim3 block(16, 16);
+
+    // How many blocks to cover the whole domain? Round UP, because integer
+    // division truncates: a 500-wide grid needs 32 blocks, not 31, or the
+    // last 4 columns would never be processed at all.
+    //
+    // Rounding up means the last block overhangs the grid edge. The bounds
+    // check at the top of the kernel is what discards that overhang - the
+    // two are designed together and neither works alone.
+    const dim3 grid((width  + block.x - 1) / block.x,
+                    (height + block.y - 1) / block.y);
+
+    splatKernel<<<grid, block>>>(uIn, uOut, dyeIn, dyeOut,
+                                 width, height, posX, posY,
+                                 impulseX, impulseY, dyeAmount, radius);
+
+    // Aborts at the failing launch rather than letting the error surface
+    // three steps later as an unexplained black screen. Compiles to nothing
+    // in Release builds.
+    CUDA_CHECK_KERNEL();
+}

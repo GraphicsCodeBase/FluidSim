@@ -25,3 +25,18 @@ void Solver2D::renderTo(cudaSurfaceObject_t surface)
 {
     launchVisualiseScalar(m_dye.read(), surface, m_width, m_height, 1.0f);
 }
+
+void Solver2D::splat(float gridX, float gridY,
+    float impulseX, float impulseY,
+    float dyeAmount, float radius)
+{
+    launchSplat(m_u.read(), m_u.write(),
+        m_dye.read(), m_dye.write(),
+        m_width, m_height,
+        gridX, gridY,
+        impulseX, impulseY,
+        dyeAmount, radius);
+
+    m_u.swap();
+    m_dye.swap();
+}

@@ -1,0 +1,9 @@
+{
+  // Suggested when anyone opens this folder. All three are already installed
+  // on this machine; this exists so a fresh clone gets prompted.
+  "recommendations": [
+    "ms-vscode.cpptools-extension-pack",
+    "ms-vscode.cmake-tools",
+    "nvidia.nsight-vscode-edition"
+  ]
+}

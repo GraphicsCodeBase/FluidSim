@@ -86,6 +86,7 @@ void App::run()
 
         const double start = glfwGetTime();
 
+        handleMouse();
         frame(static_cast<float>(start));
         drawUI();
 
@@ -97,6 +98,60 @@ void App::run()
     }
 }
 
+void App::handleMouse()
+{
+    // Let ImGui have the mouse when the cursor is over a panel - otherwise
+    // dragging a slider would also paint smoke behind it.
+    if (ImGui::GetIO().WantCaptureMouse) {
+        m_mouseWasDown = false;
+        return;
+    }
+
+    glfwGetCursorPos(m_window, &m_mouseX, &m_mouseY);
+    const bool down =
+        glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+
+    int windowW = 0, windowH = 0;
+    glfwGetWindowSize(m_window, &windowW, &windowH);
+
+    if (down && windowW > 0 && windowH > 0) {
+        // Window pixels -> grid cells.
+        //
+        // GLFW measures y DOWNWARD from the top of the window. Our grid
+        // measures y UPWARD from the bottom, so that buoyancy will simply be
+        // +y in Phase 3 with no sign flips. Hence the (1.0 - ...) below.
+        //
+        //   cursor at window top    -> mouseY = 0    -> gy = m_simHeight
+        //   cursor at window bottom -> mouseY = H    -> gy = 0
+        const float gx = static_cast<float>(m_mouseX / windowW) * m_simWidth;
+        const float gy = static_cast<float>(1.0 - m_mouseY / windowH) * m_simHeight;
+
+        // The impulse is how far the cursor travelled since the last frame,
+        // expressed in grid cells. A stationary click therefore adds dye but
+        // no motion, which is exactly what we want.
+        float impulseX = 0.0f;
+        float impulseY = 0.0f;
+
+        // Only if the button was ALREADY down last frame. On the first frame
+        // of a click the previous position is wherever the cursor happened to
+        // be beforehand, which would inject one enormous bogus impulse.
+        if (m_mouseWasDown) {
+            impulseX =  static_cast<float>((m_mouseX - m_prevMouseX) / windowW) * m_simWidth;
+            impulseY = -static_cast<float>((m_mouseY - m_prevMouseY) / windowH) * m_simHeight;
+            //         ^ same y flip, for the same reason: dragging the cursor
+            //           down should push the fluid down, i.e. negative grid y.
+        }
+
+        m_solver->splat(gx, gy,
+                        impulseX * m_splatForce, impulseY * m_splatForce,
+                        m_splatDye, m_splatRadius);
+    }
+
+    m_prevMouseX   = m_mouseX;
+    m_prevMouseY   = m_mouseY;
+    m_mouseWasDown = down;
+}
+
 void App::frame(float timeSeconds)
 {
     // ---- CUDA owns the texture -------------------------------------------
@@ -104,6 +159,7 @@ void App::frame(float timeSeconds)
     // more operators arrive this block grows into the whole simulation step.
     m_texture->map();
     m_solver->renderTo(m_texture->surface());
+
     m_texture->unmap();
 
     // ---- OpenGL owns the texture again -----------------------------------
@@ -130,16 +186,23 @@ void App::drawUI()
     ImGui::NewFrame();
 
     ImGui::Begin("Fluid Smoke");
-    ImGui::TextUnformatted("Phase 0 - CUDA/OpenGL interop check");
+    ImGui::TextUnformatted("Phase 1 - step 4: painting");
     ImGui::Separator();
     ImGui::Text("Grid       %d x %d", m_simWidth, m_simHeight);
     ImGui::Text("Frame work %.2f ms", m_frameMs);
     ImGui::Text("Displayed  %.1f FPS", ImGui::GetIO().Framerate);
+
+    ImGui::Separator();
+    ImGui::TextUnformatted("Splat");
+    ImGui::SliderFloat("dye",    &m_splatDye,    0.0f,  2.0f);
+    ImGui::SliderFloat("radius", &m_splatRadius, 2.0f, 60.0f);
+    ImGui::SliderFloat("force",  &m_splatForce,  0.0f, 10.0f);
+
     ImGui::Separator();
     ImGui::TextWrapped(
-        "If the pattern is animating, a CUDA kernel is writing directly into "
-        "an OpenGL texture with no CPU round-trip. That is the only piece of "
-        "novel plumbing in the project.");
+        "Drag with the left mouse button to paint. The dye will not move - "
+        "there is no advection yet, so the velocity impulse being injected "
+        "has nothing acting on it. That is the next operator.");
     ImGui::End();
 
     ImGui::Render();

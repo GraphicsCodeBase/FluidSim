@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Host-side debugging: breakpoints in .cpp files (App, Shader,
+      // DisplayTexture, Solver2D's host code). Uses the Visual Studio
+      // debugger, which is the right one for an MSVC-built binary.
+      //
+      // This does NOT step inside __global__ kernels - see the note in
+      // .vscode/README if you need that.
+      "name": "Debug fluid (host)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/fluid.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/bin",
+      "environment": [],
+      "console": "integratedTerminal",
+      "preLaunchTask": "CMake: build"
+    }
+  ]
+}
